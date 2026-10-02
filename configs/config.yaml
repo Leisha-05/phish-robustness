@@ -1,5 +1,6 @@
 seed: 42
 model_seeds: [0, 1, 2]
+threshold: 0.5            # fixed decision threshold used everywhere (baseline + attacks)
 
 paths:
   raw_csv: data/raw/phiusiil.csv

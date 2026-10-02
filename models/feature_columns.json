@@ -1,0 +1,1 @@
+["url_len", "host_len", "path_len", "query_len", "n_dots", "n_hyphens", "n_digits", "n_at", "n_qmark", "n_eq", "n_pct", "n_slash", "n_amp", "n_underscore", "n_hash", "host_dots", "host_hyphens", "host_digits", "n_subdomains", "path_depth", "has_ip", "has_port", "is_https", "digit_ratio", "letter_ratio", "host_entropy", "n_keywords", "tld_freq"]
