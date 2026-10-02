@@ -1,0 +1,11 @@
+pandas==3.0.2
+numpy==2.4.4
+scikit-learn==1.8.0
+xgboost==3.4.1
+pyarrow==25.0.1
+joblib==1.5.3
+tldextract==5.3.2
+PyYAML==6.0.3
+matplotlib==3.10.8
+shap==0.52.0
+scipy

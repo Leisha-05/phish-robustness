@@ -1,0 +1,31 @@
+seed: 42
+model_seeds: [0, 1, 2]
+
+paths:
+  raw_csv: data/raw/phiusiil.csv
+  splits: data/processed/splits.parquet
+  features_dir: data/processed
+  models_dir: models
+  results_dir: results
+  figures_dir: figures
+
+split:
+  train: 0.70
+  val: 0.15
+  test: 0.15
+  group_by: domain        # registered domain, so no domain is in both train and test
+
+data:
+  url_col: URL
+  label_col: label
+  max_url_len: 2000
+  flip_label: true        # PhiUSIIL: 1=legit, 0=phish -> we use 1=phish
+
+# Person 2's perturbation grid (kept here so everyone shares one config)
+perturb:
+  path_padding_tokens: [1, 3, 6]
+  subdomain_labels: [1, 2, 4]
+  char_edit_fraction: [0.10, 0.20, 0.40]
+
+xai:
+  shap_subset_size: 2000
