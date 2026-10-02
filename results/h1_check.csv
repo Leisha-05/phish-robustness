@@ -1,0 +1,9 @@
+criterion,value,worst_seed_margin,passed,h1_verdict
+rf > lr on f1,0.0037330510384704363,0.0035399000046703044,True,supported
+rf > lr on roc_auc,0.00168036196810184,0.0014136433693884287,True,supported
+xgb > lr on f1,0.004568285977597508,0.004471714202455623,True,supported
+xgb > lr on roc_auc,0.0023272012402647535,0.00230721613737761,True,supported
+lr min-seed roc_auc > 0.9,0.996364070081872,0.09636407008187198,True,supported
+rf min-seed roc_auc > 0.9,0.9977777134512604,0.0977777134512604,True,supported
+xgb min-seed roc_auc > 0.9,0.9986712862192496,0.09867128621924959,True,supported
+mlp min-seed roc_auc > 0.9,0.9978358814533114,0.09783588145331135,True,supported
