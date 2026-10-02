@@ -4,6 +4,8 @@ data:
 	$(PY) src/data_prep.py
 features:
 	$(PY) src/features.py
+tune:
+	$(PY) src/tune.py
 train:
 	$(PY) src/train.py
 perturb:
@@ -12,4 +14,4 @@ eval:
 	$(PY) src/evaluate_robustness.py
 explain:
 	$(PY) src/explain.py
-all: data features train perturb eval explain
+all: data features tune train perturb eval explain

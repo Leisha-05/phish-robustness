@@ -1,0 +1,17 @@
+{
+  "rf": {
+    "n_estimators": 300,
+    "min_samples_leaf": 2,
+    "max_features": "log2",
+    "max_depth": 30
+  },
+  "xgb": {
+    "subsample": 0.7,
+    "reg_lambda": 1,
+    "n_estimators": 600,
+    "min_child_weight": 1,
+    "max_depth": 4,
+    "learning_rate": 0.05,
+    "colsample_bytree": 0.8
+  }
+}
