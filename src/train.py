@@ -1,6 +1,6 @@
 """train.py - Step C/D/E (Person 1).
 
-Trains Logistic Regression, Random Forest and XGBoost (3 seeds each) as sklearn
+Trains Logistic Regression, Random Forest, XGBoost and a small MLP (3 seeds each) as sklearn
 Pipelines (StandardScaler + model), saves them to models/, writes clean-test
 metrics to results/baseline_metrics.csv and ROC/PR plots to figures/.
 
@@ -10,6 +10,8 @@ hyperparameters are used for RF/XGB; otherwise (or with --defaults) defaults.
 Run from the repo root:  python src/train.py
 Optional:                python src/train.py --models lr,rf
                          python src/train.py --defaults
+                         python src/train.py --models mlp     (adds/refreshes only the MLP;
+                                                               other models' rows are kept)
 """
 import argparse
 import json
@@ -23,6 +25,7 @@ import pandas as pd
 import yaml
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import (accuracy_score, average_precision_score, f1_score,
                              precision_recall_curve, precision_score,
                              recall_score, roc_auc_score, roc_curve)
@@ -32,6 +35,7 @@ from xgboost import XGBClassifier
 
 ROOT = Path(__file__).resolve().parents[1]
 CFG = yaml.safe_load((ROOT / "configs" / "config.yaml").read_text())
+ALL_MODELS = ["lr", "rf", "xgb", "mlp"]
 THRESHOLD = CFG["threshold"]          # 0.5 everywhere; Person 2's ASR depends on it
 
 
@@ -45,6 +49,11 @@ def make_model(name: str, seed: int, params: dict | None = None) -> Pipeline:
                             subsample=0.8, colsample_bytree=0.8,
                             tree_method="hist", n_jobs=-1, random_state=seed,
                             eval_metric="logloss")
+    elif name == "mlp":
+        # small MLP; early stopping holds out 10% of train internally (test/val untouched)
+        clf = MLPClassifier(hidden_layer_sizes=(64, 32), early_stopping=True,
+                            validation_fraction=0.1, n_iter_no_change=10,
+                            max_iter=300, random_state=seed)
     else:
         raise ValueError(name)
     if params:                      # tuned hyperparameters from tune.py
@@ -106,7 +115,7 @@ def make_plots(test_scores: dict, y_te, fig_dir: Path, tag: str) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--models", default="lr,rf,xgb")
+    ap.add_argument("--models", default=",".join(ALL_MODELS))
     ap.add_argument("--defaults", action="store_true",
                     help="ignore results/best_params.json and use default hyperparameters")
     args = ap.parse_args()
@@ -125,14 +134,12 @@ def main() -> None:
     # Column order contract for Person 2 / 3
     (models_dir / "feature_columns.json").write_text(json.dumps(list(X_tr.columns)))
 
-    rows, test_scores = [], {}
+    rows = []
     for name in names:
         for seed in CFG["model_seeds"]:
             model = make_model(name, seed, best.get(name)).fit(X_tr, y_tr)
             joblib.dump(model, models_dir / f"{name}_seed{seed}.joblib")
             proba = model.predict_proba(X_te)[:, 1]
-            if seed == CFG["model_seeds"][0]:
-                test_scores[name] = proba
             m = metrics(y_te, proba)
             for k, v in m.items():
                 rows.append({"model": name, "family": "clean", "severity": 0,
@@ -140,7 +147,20 @@ def main() -> None:
             print(f"{name} seed{seed}: " + "  ".join(f"{k}={v:.4f}" for k, v in m.items()))
 
     out = res_dir / "baseline_metrics.csv"
-    pd.DataFrame(rows).to_csv(out, index=False)
+    new = pd.DataFrame(rows)
+    if out.exists():                # keep rows of models not retrained in this run
+        old = pd.read_csv(out)
+        new = pd.concat([old[~old.model.isin(names)], new], ignore_index=True)
+    new["model"] = pd.Categorical(new.model, ALL_MODELS, ordered=True)
+    new.sort_values(["model", "seed"], kind="stable").to_csv(out, index=False)
+
+    # plots use the seed-0 model of every model type that exists on disk
+    seed0 = CFG["model_seeds"][0]
+    test_scores = {}
+    for n in ALL_MODELS:
+        f = models_dir / f"{n}_seed{seed0}.joblib"
+        if f.exists():
+            test_scores[n] = joblib.load(f).predict_proba(X_te)[:, 1]
     make_plots(test_scores, y_te, ROOT / CFG["paths"]["figures_dir"], tag)
     print(f"\nSaved models to {models_dir}, metrics to {out}, plots to figures/")
 
