@@ -1,0 +1,17 @@
+﻿1 lr changed share 0.058 ASR among changed 0.0
+1 rf changed share 0.057 ASR among changed 0.0
+1 xgb changed share 0.057 ASR among changed 0.0
+1 mlp changed share 0.057 ASR among changed 0.0
+2 lr changed share 0.414 ASR among changed 0.31
+2 rf changed share 0.411 ASR among changed 0.201
+2 xgb changed share 0.41 ASR among changed 0.192
+2 mlp changed share 0.411 ASR among changed 0.212
+3 lr changed share 0.505 ASR among changed 0.537
+3 rf changed share 0.501 ASR among changed 0.325
+3 xgb changed share 0.501 ASR among changed 0.315
+3 mlp changed share 0.501 ASR among changed 0.336
+       path_len  query_len
+label                     
+0      0.000000   0.000000
+1      8.226583   3.488571
+benign with no path: 1.0
